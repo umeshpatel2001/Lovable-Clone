@@ -15,8 +15,8 @@ public class Plan {
     String name;
 
     String stripePriceId;
-    Integer maxProject;
-    Integer maxProjectPerDay;
+    Integer maxProjects;
+    Integer maxTokesPerDay;
     Integer maxPreviews;
     Boolean unlimitedAi;
 
