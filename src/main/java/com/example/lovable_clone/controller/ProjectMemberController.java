@@ -2,7 +2,7 @@ package com.example.lovable_clone.controller;
 
 import com.example.lovable_clone.dto.member.InviteMemberRequest;
 import com.example.lovable_clone.dto.member.MemberResponse;
-import com.example.lovable_clone.dto.member.UpdateRoleRequest;
+import com.example.lovable_clone.dto.member.UpdateMemberRoleRequest;
 import com.example.lovable_clone.service.ProjectMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(name = "/api/projects/{projectId}/members")
+@RequestMapping("/api/projects/{projectId}/members")
 public class ProjectMemberController {
 
     private final ProjectMemberService projectMemberService;
@@ -35,16 +35,17 @@ public class ProjectMemberController {
     }
 
     @PatchMapping("/{memberId}")
-    public ResponseEntity<MemberResponse> updateMemberRole(@PathVariable Long memberId,
-                                                           @PathVariable Long projectId,
-                                                           @RequestBody UpdateRoleRequest request) {
+    public ResponseEntity<MemberResponse> updateMemberRole(
+            @PathVariable Long memberId,
+            @PathVariable Long projectId,
+            @RequestBody UpdateMemberRoleRequest request) {
         Long userId = 1L;
         return ResponseEntity.ok(projectMemberService.updateMemberRole(projectId, memberId, request, userId));
     }
 
-    @PatchMapping("/{memberId}")
-    public ResponseEntity<MemberResponse> deleteProjectMember(@PathVariable Long memberId,
-                                                           @PathVariable Long projectId) {
+    @DeleteMapping("/{memberId}")
+    public ResponseEntity<MemberResponse> deleteMember(@PathVariable Long memberId,
+                                                       @PathVariable Long projectId) {
         Long userId = 1L;
         return ResponseEntity.ok(projectMemberService.deleteProjectMember(projectId, memberId, userId));
     }
