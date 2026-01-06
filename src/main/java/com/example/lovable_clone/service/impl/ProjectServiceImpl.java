@@ -15,12 +15,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Transactional
 public class ProjectServiceImpl implements ProjectService {
 
     ProjectRepository projectRepository;
@@ -28,7 +29,6 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectMapper projectMapper;
 
     @Override
-    @Transactional
     public ProjectResponse createProject(ProjectRequest request, Long userId) {
         User owner = userRepository.findById(userId).orElseThrow();
         Project project = Project.builder()
@@ -47,17 +47,40 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectResponse getUserProjectById(Long userId) {
-        return null;
+    public ProjectResponse getUserProjectById(Long id, Long userId) {
+        Project project = getAccessibleProjectById(id, userId);
+        return projectMapper.toProjectResponse(project);
     }
 
     @Override
     public ProjectResponse updateProject(Long id, ProjectRequest request, Long userId) {
-        return null;
+        Project project = getAccessibleProjectById(id, userId);
+
+        if (!project.getOwner().getId().equals(userId)) {
+            throw new RuntimeException("You are not allowed to Update");
+        }
+
+        project.setName(request.name());
+
+        project = projectRepository.save(project);
+
+        return projectMapper.toProjectResponse(project);
     }
 
     @Override
     public void softDelete(Long id, Long userId) {
+        Project project = getAccessibleProjectById(id, userId);
 
+        if (!project.getOwner().getId().equals(userId)) {
+            throw new RuntimeException("You are not allowed to delete");
+        }
+
+        project.setDeletedAt(Instant.now());
+        projectRepository.save(project);
+    }
+
+    // INTERNAL FUNCTION
+    public Project getAccessibleProjectById(Long projectId, Long userId) {
+        return projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow();
     }
 }

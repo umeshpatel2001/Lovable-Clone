@@ -1,8 +1,9 @@
 package com.example.lovable_clone.dto.member;
 
-import javax.management.relation.Role;
+
+import com.example.lovable_clone.enums.ProjectRole;
 
 public record UpdateMemberRoleRequest(
-        Role role
+        ProjectRole role
 ) {
 }
